@@ -1,34 +1,42 @@
-const {  DataTypes } = require("sequelize");
-const db = require("../../../config/Database.js");
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../../../config/Database.js');
+const CartItem = require('../transaksi/CartItemModel.js');
 
-const Detail = db.define("detail", {
-    id_detail_transaksi: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+const Transaksi = sequelize.define(
+  'transaksi',
+  {
+    id_transaksi: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true
     },
-    transaksi_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+    total_belanja: {
+      type: DataTypes.FLOAT,
+      allowNull: false
     },
-    kategori_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+    jumlah_dibayarkan: {
+      type: DataTypes.FLOAT,
+      allowNull: false
     },
-    barang_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+    kembalian: {
+      type: DataTypes.FLOAT,
+      allowNull: false
     },
-    jumlah: {
-        type: DataTypes.FLOAT,
-        allowNull: true
+    items: {
+      type: DataTypes.JSON,
+      allowNull: false
     },
-    harga: {
-        type: DataTypes.FLOAT,
-        allowNull: true
+    nama_admin: {
+      type: DataTypes.STRING,
+      allowNull: false
     }
-},
-{
-    freezeTableNames: true,
-});
+  },
+  {
+    freezeTableName: true
+  }
+);
 
-module.exports = Detail;
+
+
+module.exports = Transaksi;

@@ -5,8 +5,9 @@ const Kategori = require("../kategori/KategoriModel.js");
 const Barang = sequelize.define("barang", {
   id_barang: {
     type: DataTypes.INTEGER,
-    allowNull: true
-  },
+    allowNull: true,
+    primaryKey: true,
+},
   nama_barang: {
     type: DataTypes.STRING,
     allowNull: true

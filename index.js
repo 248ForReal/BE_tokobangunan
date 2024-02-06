@@ -48,7 +48,7 @@ const store = new sessionStore({
 // }
 
 
-store.sync();
+// store.sync();
 
 app.use(session({
     secret: process.env.SESS_SECRET_KEY,

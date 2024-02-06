@@ -1,118 +1,135 @@
-const Detail = require("./DetailModel.js");
+const Transaksi = require("./DetailModel.js");
+const { Op } = require('sequelize');
+const moment = require('moment');
 
 exports.index = async (req, res) => {
     try {
-        const response = await Detail.findAll({});
+        const allTransaksi = await Transaksi.findAll();
 
-        res.status(200).json({
-            data: response
+        
+        return res.status(200).json({
+            message: 'Berhasil mengambil semua transaksi',
+            transaksi: allTransaksi
         });
     } catch (error) {
-        res.status(500).json({
-            msg: error.message
-        });
+        console.error(error);
+        return res.status(500).json({ message: 'Terjadi kesalahan server' });
     }
 };
 
 exports.find = async (req, res) => {
     try {
-        const response = await Detail.findOne({
-            where: {
-                id: req.params.id
-            }
-        });
-        res.status(200).json({
-            data: response
-        });
-    } catch (error) {
-        res.status(500).json({
-            msg: error.message
-        });
-    }
-};
+        
+        const { id } = req.params;
 
-exports.create = async (req, res) => {
-    const { id_detail_transaksi, transaksi_id, barang_id, jumlah, harga } = req.body;
+     
+        const transaksi = await Transaksi.findByPk(id);
 
-    try {
-        await Detail.create({
-            id_detail_transaksi: id_detail_transaksi,
-            transaksi_id: transaksi_id,
-            barang_id: barang_id,
-            jumlah: jumlah,
-            harga: harga
-        });
-        res.status(201).json({
-            msg: "Successfully created!"
-        });
-    } catch (error) {
-        res.status(400).json({
-            msg: error.message
-        });
-    }
-};
-
-exports.update = async (req, res) => {
-    const detail = await Detail.findOne({
-        where: {
-            id: req.params.id
+ 
+        if (!transaksi) {
+            return res.status(404).json({ message: 'Transaksi tidak ditemukan' });
         }
-    });
 
-    if (!detail) return res.status(404).json({
-        msg: "Detail does not exist"
-    });
+        return res.status(200).json({
+            message: 'Berhasil mendapatkan detail transaksi',
+            transaksi: transaksi
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Terjadi kesalahan server' });
+    }
+};
 
-    const { id_detail_transaksi, transaksi_id, barang_id, jumlah, harga } = req.body;
-
+exports.destroy= async (req, res) => {
     try {
-        await Detail.update(
-            {
-                id_detail_transaksi: id_detail_transaksi,
-                transaksi_id: transaksi_id,
-                barang_id: barang_id,
-                jumlah: jumlah,
-                harga: harga
-            },
-            {
-                where: {
-                    id: detail.id
+        const { id } = req.params;
+        const transaksi = await Transaksi.findByPk(id);
+
+
+        if (!transaksi) {
+            return res.status(404).json({ message: 'Transaksi tidak ditemukan' });
+        }
+
+        
+        await transaksi.destroy();
+        return res.status(200).json({ message: 'Transaksi berhasil dihapus' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Terjadi kesalahan server' });
+    }
+};
+
+exports.findhariini = async (req, res) => {
+    try {
+     
+        const today = moment().startOf('day');
+
+      
+        const transaksiHariIni = await Transaksi.findAll({
+            where: {
+                createdAt: {
+                    [Op.gte]: today.toDate() 
                 }
             }
-        );
-        res.status(200).json({
-            msg: "Detail updated!"
+        });
+
+       
+        return res.status(200).json({
+            message: 'Transaksi hari ini',
+            transaksi: transaksiHariIni
         });
     } catch (error) {
-        res.status(400).json({
-            msg: error.message
-        });
+        console.error(error);
+        return res.status(500).json({ message: 'Terjadi kesalahan server' });
     }
 };
 
-exports.destroy = async (req, res) => {
-    const detail = await Detail.findOne({
-        where: {
-            id: req.params.id
-        }
-    });
 
-    if (!detail) return res.status(404).json({
-        msg: "Detail does not exist"
-    });
-
+exports.findmingguini = async (req, res) => {
     try {
-        await Detail.destroy({
+     
+        const lastWeek = moment().subtract(1, 'week').startOf('day');
+
+
+        const transaksiMingguIni = await Transaksi.findAll({
             where: {
-                id: detail.id
+                createdAt: {
+                    [Op.gte]: lastWeek.toDate() 
+                }
             }
         });
-        res.status(200).json({
-            msg: "Detail deleted!"
+
+        return res.status(200).json({
+            message: 'Transaksi dalam 1 minggu terakhir',
+            transaksi: transaksiMingguIni
         });
     } catch (error) {
-        res.status(400).json({
-            msg: error.message
+        console.error(error);
+        return res.status(500).json({ message: 'Terjadi kesalahan server' });
+    }
+};
+
+
+exports.findbulanini = async (req, res) => {
+    try {
+        const lastMonth = moment().subtract(1, 'month').startOf('day');
+
+     
+        const transaksiBulanIni = await Transaksi.findAll({
+            where: {
+                createdAt: {
+                    [Op.gte]: lastMonth.toDate() 
+                }
+            }
         });
+
+   
+        return res.status(200).json({
+            message: 'Transaksi dalam 1 bulan terakhir',
+            transaksi: transaksiBulanIni
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Terjadi kesalahan server' });
     }
 };
