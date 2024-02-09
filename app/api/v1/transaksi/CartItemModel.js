@@ -34,10 +34,10 @@ const CartItem = db.define("cartItem", {
     freezeTableNames: true,
 });
 
-// Menambahkan hubungan antara CartItem dan Barang dengan alias 'barang'
+
 CartItem.belongsTo(Barang, {
     foreignKey: 'id_barang',
-    as: 'barang', // Tambahkan alias di sini
+    as: 'barang', 
     targetKey: 'id_barang'
 });
 

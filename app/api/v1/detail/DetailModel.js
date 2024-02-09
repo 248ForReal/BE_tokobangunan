@@ -6,10 +6,9 @@ const Transaksi = sequelize.define(
   'transaksi',
   {
     id_transaksi: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING, 
       allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
+      primaryKey: true
     },
     total_belanja: {
       type: DataTypes.FLOAT,
@@ -36,7 +35,5 @@ const Transaksi = sequelize.define(
     freezeTableName: true
   }
 );
-
-
 
 module.exports = Transaksi;

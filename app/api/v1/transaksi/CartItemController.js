@@ -6,6 +6,25 @@ const Sequelize = require('sequelize');
 const sequelize = require('../../../config/Database.js');
 
 
+const generateUniqueTransactionId = async () => {
+    let lastTransactionDate = null;
+    let transactionCount = 0;
+
+    const currentTime = new Date();
+    const currentDate = currentTime.toISOString().slice(0, 10); 
+
+    if (lastTransactionDate !== currentDate) {
+        transactionCount = 0; 
+        lastTransactionDate = currentDate; 
+    }
+
+    transactionCount++; 
+    const paddedTransactionCount = transactionCount.toString().padStart(3, '0'); 
+
+    const uniqueId = `T${currentDate}${paddedTransactionCount}`;
+
+    return uniqueId;
+};
 
 
 exports.index = async (req, res) => {
@@ -282,13 +301,14 @@ exports.transaction = async (req, res) => {
 
         
         const kembalian = jumlah_dibayarkan - total;
+        const uniqueId = await generateUniqueTransactionId();
 
-      
         const transaction = await Transaction.create({
+            id_transaksi: uniqueId,
             total_belanja: total,
             jumlah_dibayarkan: jumlah_dibayarkan,
             kembalian: kembalian,
-            items: JSON.stringify(items), 
+            items: JSON.parse(JSON.stringify(items)), 
             nama_admin: admin.nama_admin 
         });
 
