@@ -2,19 +2,42 @@ const Barang = require("./BarangModel.js");
 const  uploadMiddleware = require("../../../../multer.js");
 const fs = require('fs').promises;
 const path = require('path');
+const { Op } = require('sequelize');
 exports.index = async (req, res) => {
     try {
-       const response = await Barang.findAll({})
-
-       res.status(200).json({
-        data: response
-    })
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+        const query = req.query.q || ''; 
+        const searchQuery = {
+            where: {
+                [Op.or]: [
+                    { nama_barang: { [Op.like]: `%${query}%` } },
+                    { id_barang: { [Op.like]: `%${query}%`} }
+                ]
+            },
+            offset: offset,
+            limit: limit
+        };
+        const response = await Barang.findAndCountAll(searchQuery);
+        const totalPages = Math.ceil(response.count / limit);
+        res.status(200).json({
+            data: response.rows,
+            pagination: {
+                totalItems: response.count,
+                totalPages: totalPages,
+                currentPage: page,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+        });
     } catch (error) {
-         res.status(500).json({
-            msg: error.message  
-        })
+        res.status(500).json({
+            msg: error.message
+        });
     }
-}
+};
+
 
 exports.find = async (req, res) => {
     try {

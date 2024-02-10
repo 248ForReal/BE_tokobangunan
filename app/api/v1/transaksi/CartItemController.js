@@ -11,28 +11,22 @@ const generateUniqueTransactionId = async () => {
         const currentTime = new Date();
         const currentDate = currentTime.toISOString().slice(0, 10);
         
-        // Ambil data transaksi terakhir dari database
         const lastTransaction = await Transaction.findOne({
-            order: [['createdAt', 'DESC']] // Mengurutkan transaksi berdasarkan tanggal pembuatan secara descending
+            order: [['createdAt', 'DESC']] 
         });
 
         let lastTransactionDate = null;
         let transactionCount = 0;
 
-        // Jika ada transaksi terakhir, ambil tanggal pembuatan transaksi terakhir
         if (lastTransaction) {
             lastTransactionDate = lastTransaction.createdAt.toISOString().slice(0, 10);
-            // Jika tanggal transaksi terakhir sama dengan tanggal saat ini, gunakan nomor urut dari transaksi terakhir
             if (lastTransactionDate === currentDate) {
-                transactionCount = parseInt(lastTransaction.id_transaksi.slice(-3)); // Ambil nomor urut dari ID transaksi terakhir
+                transactionCount = parseInt(lastTransaction.id_transaksi.slice(-3)); 
             }
         }
-
-        // Mencari nomor urut terakhir untuk tanggal yang sama
         if (lastTransactionDate === currentDate) {
             transactionCount++;
         } else {
-            // Jika tanggal terakhir tidak sama dengan tanggal saat ini, reset nomor urut
             transactionCount = 1;
         }
 
