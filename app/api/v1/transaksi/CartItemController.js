@@ -2,29 +2,54 @@ const CartItem = require("./CartItemModel.js");
 const Admin = require("../adminn/AdminModel.js");
 const Barang = require("../barang/BarangModel.js")
 const Transaction = require('../detail/DetailModel.js');
-const Sequelize = require('sequelize');
+const  Sequelize= require('sequelize');
 const sequelize = require('../../../config/Database.js');
 
 
 const generateUniqueTransactionId = async () => {
-    let lastTransactionDate = null;
-    let transactionCount = 0;
+    try {
+        const currentTime = new Date();
+        const currentDate = currentTime.toISOString().slice(0, 10);
+        
+        // Ambil data transaksi terakhir dari database
+        const lastTransaction = await Transaction.findOne({
+            order: [['createdAt', 'DESC']] // Mengurutkan transaksi berdasarkan tanggal pembuatan secara descending
+        });
 
-    const currentTime = new Date();
-    const currentDate = currentTime.toISOString().slice(0, 10); 
+        let lastTransactionDate = null;
+        let transactionCount = 0;
 
-    if (lastTransactionDate !== currentDate) {
-        transactionCount = 0; 
-        lastTransactionDate = currentDate; 
+        // Jika ada transaksi terakhir, ambil tanggal pembuatan transaksi terakhir
+        if (lastTransaction) {
+            lastTransactionDate = lastTransaction.createdAt.toISOString().slice(0, 10);
+            // Jika tanggal transaksi terakhir sama dengan tanggal saat ini, gunakan nomor urut dari transaksi terakhir
+            if (lastTransactionDate === currentDate) {
+                transactionCount = parseInt(lastTransaction.id_transaksi.slice(-3)); // Ambil nomor urut dari ID transaksi terakhir
+            }
+        }
+
+        // Mencari nomor urut terakhir untuk tanggal yang sama
+        if (lastTransactionDate === currentDate) {
+            transactionCount++;
+        } else {
+            // Jika tanggal terakhir tidak sama dengan tanggal saat ini, reset nomor urut
+            transactionCount = 1;
+        }
+
+        const paddedTransactionCount = transactionCount.toString().padStart(3, '0');
+
+        const uniqueId = `T${currentDate}${paddedTransactionCount}`;
+
+        return uniqueId;
+    } catch (error) {
+        console.error("Error generating unique transaction ID:", error);
+        throw new Error("Error generating unique transaction ID");
     }
-
-    transactionCount++; 
-    const paddedTransactionCount = transactionCount.toString().padStart(3, '0'); 
-
-    const uniqueId = `T${currentDate}${paddedTransactionCount}`;
-
-    return uniqueId;
 };
+
+
+
+
 
 
 exports.index = async (req, res) => {
@@ -308,9 +333,10 @@ exports.transaction = async (req, res) => {
             total_belanja: total,
             jumlah_dibayarkan: jumlah_dibayarkan,
             kembalian: kembalian,
-            items: JSON.parse(JSON.stringify(items)), 
+            items: items, 
             nama_admin: admin.nama_admin 
         });
+        
 
         await Promise.all(totalBelanja.map(async item => {
             const { id_barang, quantity } = item.dataValues;
