@@ -37,11 +37,14 @@ exports.create = async (req, res) => {
     uploadMiddleware.single('gambar')(req, res, async (err) => {
         if (err) {
             console.log(err); 
-            return res.status(400).json({ msg: "Error uploading image" });
+
         }
 
         const { id_barang, nama_barang, kategori_id, harga, stok } = req.body;
-        const gambar = req.file ? req.file.filename : null;
+        let gambar = null; 
+        if (req.file) {
+            gambar = req.file.filename;
+        }
 
         try {
             await Barang.create({
@@ -64,41 +67,40 @@ exports.create = async (req, res) => {
     });
 }
 
+
 exports.update = async (req, res) => {
-    const barang = await Barang.findOne({
-        where: {
-            id: req.params.id
-        }
-    });
-
-    if (!barang) {
-        return res.status(404).json({
-            msg: "Barang does not exist"
-        });
-    }
-
-    const { id_barang, nama_barang, kategori_id, harga, stok } = req.body;
-    const { gambar } = req.file; 
-
     try {
-        
-        if (barang.gambar) {
-            const oldImagePath = path.join(__dirname, '../../../../image', barang.gambar);
-            await fs.unlink(oldImagePath);
+        const barang = await Barang.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!barang) {
+            return res.status(404).json({
+                msg: "Barang does not exist"
+            });
         }
 
-    
+        const { id_barang, nama_barang, kategori_id, harga, stok } = req.body;
+        let gambar = barang.gambar; 
+
+        if (req.file) {
+            gambar = req.file.filename;
+
+            if (barang.gambar) {
+                const oldImagePath = path.join(__dirname, '../../../../image', barang.gambar);
+                await fs.unlink(oldImagePath);
+            }
+        }
+
         await barang.update({
             id_barang,
             nama_barang,
             kategori_id,
             harga,
             stok,
-            gambar: gambar ? gambar.filename : null 
-        }, {
-            where: {
-                id: barang.id
-            }
+            gambar: gambar 
         });
 
         res.status(200).json({
