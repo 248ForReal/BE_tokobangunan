@@ -60,7 +60,10 @@ app.use(session({
     }
 }));
 
-
+app.use(cors({
+    credentials: true,
+    origin: 'http://localhost:5173'
+}))
 
 const v1 = '/api/v1';
 app.use(v1, adminnRouter);
