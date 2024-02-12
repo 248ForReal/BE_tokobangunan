@@ -271,7 +271,9 @@ exports.subtractOneQuantity = async (req, res) => {
 
 exports.transaction = async (req, res) => {
     try {
+        const { total_belanja, jumlah_dibayarkan, kembalian, items } = req.body;
         const admin_uuid = req.session.userId;
+
         if (!admin_uuid) {
             return res.status(403).json({
                 msg: "Unauthorized access. Missing admin_uuid in session."
@@ -287,61 +289,25 @@ exports.transaction = async (req, res) => {
                 msg: "Admin not found."
             });
         }
-
-      
-        const totalBelanja = await CartItem.findAll({
-            attributes: [
-                'id_barang',
-                [Sequelize.fn('sum', Sequelize.col('quantity')), 'quantity'],
-                [Sequelize.fn('sum', Sequelize.col('total_harga')), 'total_harga']
-            ],
-            group: ['id_barang'],
-            include: [{
-                model: Barang,
-                as: 'barang',
-                attributes: ['nama_barang', 'stok'] 
-            }]
-        });
-
-        const items = totalBelanja.map(item => ({
-            nama_barang: item.barang.nama_barang,
-            quantity: item.quantity,
-            total_harga: item.total_harga
-        }));
-
-    
-        let total = 0;
-        totalBelanja.forEach(item => {
-            total += item.total_harga;
-        });
-
-      
-        const { jumlah_dibayarkan } = req.body;
-
-        
-        const kembalian = jumlah_dibayarkan - total;
         const uniqueId = await generateUniqueTransactionId();
 
         const transaction = await Transaction.create({
             id_transaksi: uniqueId,
-            total_belanja: total,
+            total_belanja: total_belanja,
             jumlah_dibayarkan: jumlah_dibayarkan,
             kembalian: kembalian,
-            items: items, 
-            nama_admin: admin.nama_admin 
+            items: items,
+            nama_admin: admin.nama_admin
         });
-        
 
-        await Promise.all(totalBelanja.map(async item => {
-            const { id_barang, quantity } = item.dataValues;
-            const barang = await Barang.findByPk(id_barang);
+        await Promise.all(items.map(async item => {
+            const { nama_barang, quantity } = item;
+            const barang = await Barang.findOne({ where: { nama_barang: nama_barang } });
             if (barang) {
-                await barang.update({ stok: sequelize.literal(`stok - ${quantity}`) });
+                await barang.update({ stok: barang.stok - quantity });
             }
         }));
 
-        await CartItem.destroy({ where: {} });
-        await sequelize.query('ALTER TABLE cartItems AUTO_INCREMENT = 1');
         return res.status(200).json({
             message: 'Transaksi berhasil',
             transaction: transaction,
@@ -352,6 +318,7 @@ exports.transaction = async (req, res) => {
         return res.status(500).json({ message: 'Terjadi kesalahan server' });
     }
 };
+
 
 
 
