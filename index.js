@@ -41,14 +41,14 @@ const store = new sessionStore({
     db: db
 });
 
-// try{
-// db.sync()
-// } catch(err){
-// console.error(err)
-// }
+try{
+db.sync()
+} catch(err){
+console.error(err)
+}
 
 
-// store.sync();
+store.sync();
 
 app.use(session({
     secret: process.env.SESS_SECRET_KEY,

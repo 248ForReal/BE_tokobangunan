@@ -7,5 +7,5 @@ const {
 const router = express.Router();
 
 
-router.post('/transaction', verifyUser,adminRole,transaction);
+router.post('/transaction', verifyUser,kasirRole ,transaction);
 module.exports = router;
