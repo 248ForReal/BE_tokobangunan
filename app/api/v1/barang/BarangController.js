@@ -11,7 +11,7 @@ exports.index = async (req, res) => {
             where: {
                 [Op.or]: [
                     { nama_barang: { [Op.like]: `%${query}%` } },
-                    { id_barang: { [Op.like]: `%${query}%`} }
+                    { barcode_barang: { [Op.like]: `%${query}%`} }
                 ]
             },
         };
