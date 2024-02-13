@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyUser } = require("../../../middleware/AuthUser.js");
+const { verifyUser,adminRole } = require("../../../middleware/AuthUser.js");
 const upload = require("../../../../multer.js");
 const {
   index,
@@ -11,10 +11,10 @@ const {
 
 const router = express.Router();
 
-router.get('/barang', verifyUser, index);
-router.get('/barang/:id', verifyUser, find);
-router.post('/barang', verifyUser, create);
-router.patch('/barang/:id', verifyUser,  update);
-router.delete('/barang/:id', verifyUser, destroy);
+router.get('/barang', verifyUser,adminRole, index);
+router.get('/barang/:id', verifyUser,adminRole, find);
+router.post('/barang', verifyUser,adminRole, create);
+router.patch('/barang/:id', verifyUser,adminRole,  update);
+router.delete('/barang/:id', verifyUser,adminRole, destroy);
 
 module.exports = router;

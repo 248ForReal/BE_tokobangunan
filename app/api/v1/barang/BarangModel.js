@@ -6,6 +6,7 @@ const Barang = sequelize.define("barang", {
   barcode_barang: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    unique: true
   },
   nama_barang: {
     type: DataTypes.STRING,

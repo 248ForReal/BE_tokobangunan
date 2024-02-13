@@ -11,7 +11,8 @@ exports.index = async (req, res) => {
             where: {
                 [Op.or]: [
                     { nama_barang: { [Op.like]: `%${query}%` } },
-                    { barcode_barang: { [Op.like]: `%${query}%`} }
+                    { barcode_barang: { [Op.like]: `%${query}%`} },
+                    { kategori_id: { [Op.like]: `%${query}%`} }
                 ]
             },
         };
@@ -31,7 +32,7 @@ exports.find = async (req, res) => {
     try {
         const response = await Barang.findOne({
             where: {
-                id_barang: req.params.id
+                barcode_barang: req.params.id
             }
         })
         res.status(200).json({
@@ -45,45 +46,51 @@ exports.find = async (req, res) => {
 }
 
 exports.create = async (req, res) => {
-    uploadMiddleware.single('gambar')(req, res, async (err) => {
-        if (err) {
-            console.log(err); 
+    const { barcode_barang, nama_barang, kategori_id, harga_modal, harga_jual, persen_keuntungan, stok } = req.body;
 
-        }
+    try {
+      
+        const existingBarang = await Barang.findOne({
+            where: {
+                barcode_barang: barcode_barang
+            }
+        });
 
-        const { id_barang, nama_barang, kategori_id, harga, stok } = req.body;
-        let gambar = null; 
-        if (req.file) {
-            gambar = req.file.filename;
-        }
 
-        try {
-            await Barang.create({
-                id_barang,
-                nama_barang,
-                kategori_id,
-                harga,
-                stok,
-                gambar
-            });
-
-            res.status(201).json({
-                msg: "Successfully created!"
-            });
-        } catch (error) {
-            res.status(400).json({
-                msg: error.message
+        if (existingBarang) {
+            return res.status(400).json({
+                msg: "Barcode already exists!"
             });
         }
-    });
+
+  
+        await Barang.create({
+            barcode_barang,
+            nama_barang,
+            kategori_id,
+            harga_modal,
+            harga_jual,
+            persen_keuntungan,
+            stok
+        });
+
+      
+        res.status(201).json({
+            msg: "Successfully created!"
+        });
+    } catch (error) {
+        
+        res.status(400).json({
+            msg: error.message
+        });
+    }
 }
-
 
 exports.update = async (req, res) => {
     try {
         const barang = await Barang.findOne({
             where: {
-                id_barang: req.params.id
+                id: req.params.id
             }
         });
 
@@ -93,25 +100,12 @@ exports.update = async (req, res) => {
             });
         }
 
-        const { id_barang, nama_barang, kategori_id, harga, stok } = req.body;
-        let gambar = barang.gambar; 
+        const {barcode_barang, nama_barang, kategori_id,  harga_modal,harga_jual,persen_keuntungan, stok} = req.body;
 
-        if (req.file) {
-            gambar = req.file.filename;
-
-            if (barang.gambar) {
-                const oldImagePath = path.join(__dirname, '../../../../image', barang.gambar);
-                await fs.unlink(oldImagePath);
-            }
-        }
+    
 
         await barang.update({
-            id_barang,
-            nama_barang,
-            kategori_id,
-            harga,
-            stok,
-            gambar: gambar 
+            barcode_barang, nama_barang, kategori_id,  harga_modal,harga_jual,persen_keuntungan, stok 
         });
 
         res.status(200).json({
@@ -124,10 +118,12 @@ exports.update = async (req, res) => {
     }
 };
 
+
+
 exports.destroy = async (req, res) => {
     const barang = await Barang.findOne({
         where: {
-            id_barang: req.params.id
+            id: req.params.id
         }
     })
 
@@ -138,7 +134,7 @@ exports.destroy = async (req, res) => {
     try {
         await Barang.destroy({
             where: {
-                id_barang: barang.id_barang
+                id: barang.id_barang
             }
         })
         res.status(200).json({

@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyUser } = require("../../../middleware/AuthUser.js");
+const { verifyUser,adminRole } = require("../../../middleware/AuthUser.js");
 const {
     index,
     find,
@@ -10,10 +10,10 @@ const {
 
 const router = express.Router();
 
-router.get('/kategori', verifyUser,index);
-router.get('/kategori/:id', verifyUser,find);
-router.post('/kategori', verifyUser,create);
-router.patch('/kategori/:id', verifyUser,update);
-router.delete('/kategori/:id', verifyUser,destroy);
+router.get('/kategori', verifyUser,adminRole,index);
+router.get('/kategori/:id', verifyUser,adminRole,find);
+router.post('/kategori', verifyUser,adminRole,create);
+router.patch('/kategori/:id', verifyUser,adminRole,update);
+router.delete('/kategori/:id', verifyUser,adminRole,destroy);
 
 module.exports = router;

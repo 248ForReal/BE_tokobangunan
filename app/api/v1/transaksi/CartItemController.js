@@ -75,8 +75,8 @@ exports.transaction = async (req, res) => {
         });
 
         await Promise.all(items.map(async item => {
-            const { id_barang, quantity } = item;
-            const barang = await Barang.findByPk(id_barang);
+            const { barcode_barang, quantity } = item;
+            const barang = await Barang.findByPk(barcode_barang);
             if (barang) {
                 await barang.update({ stok: barang.stok - quantity });
             }
