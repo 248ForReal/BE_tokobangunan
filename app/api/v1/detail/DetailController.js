@@ -12,9 +12,13 @@ exports.index = async (req, res) => {
             where: {
                 nama_admin: {
                     [Op.like]: `%${searchKeyword}%`
+                },
+                id_transaksi: {
+                    [Op.like]: `%${searchKeyword}%`
                 }
             }
         };
+        
 
         const totalTransaksi = await Transaksi.count(searchQuery);
         const allTransaksi = await Transaksi.findAll({

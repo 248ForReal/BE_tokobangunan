@@ -11,11 +11,11 @@ const {
 
 const router = express.Router();
 
-router.get('/detail', verifyUser, index);
+router.get('/detail', index);
 router.get('/detail/hari', verifyUser, findhariini);
 router.get('/detail/minggu', verifyUser, findmingguini);
 router.get('/detail/bulan', verifyUser, findbulanini);
-router.get('/detail/:id', verifyUser, find);
+router.get('/detail/:id', find);
 router.delete('/detail/:id', verifyUser, destroy);
 
 module.exports = router;

@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/barang', verifyUser, index);
 router.get('/barang/:id', verifyUser, find);
 router.post('/barang', verifyUser, create);
-router.patch('/barang/:id', verifyUser, upload.single('gambar'), update);
+router.patch('/barang/:id', verifyUser,  update);
 router.delete('/barang/:id', verifyUser, destroy);
 
 module.exports = router;

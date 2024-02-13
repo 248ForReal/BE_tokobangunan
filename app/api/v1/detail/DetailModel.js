@@ -1,6 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../../../config/Database.js');
-const CartItem = require('../transaksi/CartItemModel.js');
 
 const Transaksi = sequelize.define(
   'transaksi',
