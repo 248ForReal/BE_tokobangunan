@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 const moment = require('moment');
 const pesan = `Laporan untuk bulan ${moment().format('MMMM YYYY')}`;
 console.log(pesan);
+
 exports.index = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1; 
@@ -12,23 +13,18 @@ exports.index = async (req, res) => {
         const searchKeyword = req.query.q || '';
         const searchQuery = {
             where: {
-                nama_admin: {
-                    [Op.like]: `%${searchKeyword}%`
-                },
-                id_transaksi: {
-                    [Op.like]: `%${searchKeyword}%`
-                }
-            }
-        };
-        
-
-        const totalTransaksi = await Transaksi.count(searchQuery);
-        const allTransaksi = await Transaksi.findAll({
-            where: searchQuery.where,
+                [Op.or]: [
+                    { nama_admin: { [Op.like]: `%${searchKeyword}%` } },
+                    { id_transaksi: { [Op.like]: `%${searchKeyword}%` } }
+                ]
+            },
             order: [['createdAt', 'DESC']], 
             offset: offset,
             limit: limit
-        });
+        };
+
+        const totalTransaksi = await Transaksi.count(searchQuery);
+        const allTransaksi = await Transaksi.findAll(searchQuery);
         const totalPages = Math.ceil(totalTransaksi / limit);
 
         return res.status(200).json({
@@ -47,6 +43,7 @@ exports.index = async (req, res) => {
         return res.status(500).json({ message: 'Terjadi kesalahan server' });
     }
 };
+
 
 exports.totalHarian = async (req, res) => {
     try {

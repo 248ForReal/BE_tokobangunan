@@ -4,8 +4,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { Op } = require('sequelize');
 exports.index = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1; 
+    try { 
         const query = req.query.q || ''; 
         const searchQuery = {
             where: {
@@ -26,6 +25,7 @@ exports.index = async (req, res) => {
         });
     }
 };
+
 
 
 exports.find = async (req, res) => {
