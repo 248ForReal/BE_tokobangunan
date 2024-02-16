@@ -24,11 +24,11 @@ exports.signIn = async (req, res) => {
       });
     }
 
-    req.session.userId = admin.uuid;
+    req.Session.userId = admin.uuid;
     const { uuid, nama_admin, role } = admin;
 
     res.status(200).json({
-      sessionData: {
+      SessionData: {
         uuid,
         nama_admin,
         role,
@@ -44,7 +44,7 @@ exports.signIn = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   try {
-    if (!req.session.userId) {
+    if (!req.Session.userId) {
       return res.status(401).json({
         msg: "Please login to your account!",
       });
@@ -53,7 +53,7 @@ exports.getMe = async (req, res) => {
     const admin = await Admin.findOne({
       attributes: ["uuid", "nama_admin", "role"],
       where: {
-        uuid: req.session.userId,
+        uuid: req.Session.userId,
       },
     });
 
@@ -65,16 +65,13 @@ exports.getMe = async (req, res) => {
 
     res.status(200).json(admin);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Internal server error",
-    });
+    throw new Error(error.message)
   }
 };
 
 exports.signOut = async (req, res) => {
   try {
-    req.session.destroy((err) => {
+    req.Session.destroy((err) => {
       if (err) {
         return res.status(400).json({
           msg: err.message,

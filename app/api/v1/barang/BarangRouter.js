@@ -1,6 +1,5 @@
 const express = require("express");
 const { verifyUser,adminRole } = require("../../../middleware/AuthUser.js");
-const upload = require("../../../../multer.js");
 const {
   index,
   find,

@@ -7,7 +7,9 @@ const cors = require('cors');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const { Sequelize } = require("sequelize");
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const SequelizeStore = require('connect-session-sequelize');
+const sessionStore = SequelizeStore(session.Store);
+
 const db = require('./app/config/Database.js');
 const adminnRouter = require('./app/api/v1/adminn/AdminRouter.js');
 const barangRouter = require('./app/api/v1/barang/BarangRouter.js');
@@ -16,10 +18,12 @@ const kategoriRouter = require('./app/api/v1/kategori/KategoriRouter.js');
 const transaksiRouter = require('./app/api/v1/transaksi/TransaksiRouter.js');
 const authRouter = require("./app/auth/AuthRouter.js");
 
-dotenv.config();
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+
+dotenv.config()
 const app = express();
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -29,12 +33,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const store = new SequelizeStore({
-    db: db,
-    table: 'session' // Atur nama tabel menjadi "session"
+const store = new sessionStore({
+    db: db
 });
 
-store.sync();
+// try {
+//     db.sync()
+// } catch (err) {
+//     console.error(err)
+// }
+
+// store.sync();
 
 app.use(session({
     secret: process.env.SESS_SECRET_KEY,
@@ -49,7 +58,7 @@ app.use(session({
 app.use(cors({
     credentials: true,
     origin: 'http://localhost:5173'
-}));
+}))
 
 const v1 = '/api/v1';
 app.use(v1, adminnRouter);
@@ -60,23 +69,29 @@ app.use(v1, transaksiRouter);
 
 app.use(authRouter);
 
-// catch 404 and forward to error handler
+app.get('/', function(req, res) {
+    res.send('Hello, World!');
+});
+
 app.use(function(req, res, next) {
     next(createError(404));
 });
 
-// error handler
 app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // render the error page
     res.status(err.status || 500);
     res.render('error');
 });
 
-// Define por
+const http = require('http');
 
-// Start the server
-app.listen();
+const port = process.env.PORT || 3000; 
+
+const server = http.createServer(app);
+
+server.listen(port, () => {
+    console.log(`Server berjalan di http://localhost:${port}`);
+});
+
+module.exports = app;

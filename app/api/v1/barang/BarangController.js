@@ -1,5 +1,4 @@
 const Barang = require("./BarangModel.js");
-const  uploadMiddleware = require("../../../../multer.js");
 const fs = require('fs').promises;
 const path = require('path');
 const { Op } = require('sequelize');

@@ -49,7 +49,6 @@ exports.totalHarian = async (req, res) => {
     try {
         const today = moment().startOf('day');
 
-        // Menghitung total jumlah dibayarkan hari ini
         const totalHarian = await Transaksi.sum('jumlah_dibayarkan', {
             where: {
                 createdAt: {
@@ -59,7 +58,6 @@ exports.totalHarian = async (req, res) => {
             }
         });
 
-        // Menghitung total item yang terjual hari ini
         const transaksiHariIni = await Transaksi.findAll({
             where: {
                 createdAt: {

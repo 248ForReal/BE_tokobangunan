@@ -1,21 +1,22 @@
 {
   "development": {
-    "username": "root",
-    "password": "",
-    "database": "tokobangunan",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "sumber12_admin2",
+    "password": "V255Z4,WB5K#",
+    "database": "sumber12_tokobangunan",
+    "host": "api.sbrezeki.online",
+    "dialect": "mysql",
+    "timezone": "+07:00"
   },
   "test": {
     "username": "root",
-    "password": null,
+    "password": "",
     "database": "database_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": null,
+    "password": "",
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "mysql"
