@@ -10,6 +10,6 @@ const router = express.Router();
 
 
 router.post('/transaction/jual', verifyUser,transaction_jual);
-router.post('/transaction/beli', verifyUser,transaction_beli);
+router.post('/transaction/beli', verifyUser, adminRole,transaction_beli);
 
 module.exports = router;

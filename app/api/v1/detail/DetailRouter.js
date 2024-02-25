@@ -20,20 +20,20 @@ const {
 
 const router = express.Router();
 
-router.get('/penjualan', index);
+router.get('/penjualan', verifyUser, index);
 router.get('/penjualan/hari', verifyUser, PenjualanHarian);
 router.get('/penjualan/minggu', verifyUser, PenjualanMingguan);
-router.get('/penjualan/bulan', verifyUser, PenjualanBulanan);
-router.get('/penjualan/:id', find_penjualan); // Perhatikan perubahan nama fungsi menjadi find_penjualan
-router.put('/penjualan/return/:id', pengembalian);
-router.post('/penjualan/laporan', verifyUser, LaporanPenjualan);
+router.get('/penjualan/bulan', verifyUser, adminRole, PenjualanBulanan);
+router.get('/penjualan/:id',verifyUser, adminRole, find_penjualan); 
+router.put('/penjualan/return/:id',verifyUser, adminRole, pengembalian);
+router.post('/penjualan/laporan', verifyUser, adminRole, LaporanPenjualan);
 
-router.get('/pembelian', index_pembelian);
-router.get('/pembelian/:id', find_pembelian);
-router.get('/pembelian/detail/hari', verifyUser, PembelianHari); // Perbaikan pada nama rute
-router.get('/pembelian/detail/minggu', verifyUser, PembelianMingguan);
-router.get('/pembelian/detail/bulan', verifyUser, PembelianBulan);
-router.post('/pembelian/detail/laporan', verifyUser, LaporanPembelian);
+router.get('/pembelian',verifyUser, adminRole, index_pembelian);
+router.get('/pembelian/:id',verifyUser, adminRole, find_pembelian);
+router.get('/pembelian/detail/hari', verifyUser, adminRole, PembelianHari); 
+router.get('/pembelian/detail/minggu', verifyUser, adminRole, PembelianMingguan);
+router.get('/pembelian/detail/bulan', verifyUser, adminRole, PembelianBulan);
+router.post('/pembelian/detail/laporan', verifyUser, adminRole, LaporanPembelian);
 
 router.delete('/detail/:id', verifyUser, destroy);
 router.post('/refund', verifyUser, adminRole, refund);

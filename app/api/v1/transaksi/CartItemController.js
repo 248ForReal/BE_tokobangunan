@@ -75,7 +75,6 @@ exports.transaction_jual = async (req, res) => {
             jumlah_modal_keseluruhan += item.jumlah_modal; 
         });
 
-        
         items.unshift({ jumlah_modal_keseluruhan });
 
         const transaction = await Transaction.create({
@@ -95,6 +94,10 @@ exports.transaction_jual = async (req, res) => {
             }
         }));
 
+        const createdTransaction = await Transaction.findOne({
+            where: { id_transaksi: uniqueId }
+        });
+
         return res.status(200).json({
             message: 'Transaksi berhasil',
             transaction: {
@@ -103,7 +106,8 @@ exports.transaction_jual = async (req, res) => {
                 jumlah_dibayarkan: jumlah_dibayarkan,
                 kembalian: kembalian,
                 items: items,
-                nama_admin: admin.nama_admin
+                nama_admin: admin.nama_admin,
+                created_at: createdTransaction.createdAt 
             },
             kembalian: kembalian
         });
